@@ -4,5 +4,5 @@ using namespace std;
 
 def main()
 {
-  cout << "fuck this << endl;
+  cout << "fuck this" << endl;
 }
