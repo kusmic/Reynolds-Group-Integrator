@@ -1,8 +1,16 @@
-import <iostream>
+#include <iostream>
+#include "ndarray.h"
+#include <vector>
 
 using namespace std;
 
-def main()
+int main()
 {
-  cout << "fuck this" << endl;
+  ndarray<int> test {3,0,2};
+  for (int x : test)
+  {
+      cout << x << " ";
+  }
+
+  return 0;
 }
