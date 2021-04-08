@@ -1,16 +1,19 @@
 #include <iostream>
-#include "ndarray.h"
-#include <vector>
+#include <valarray>
+#include <cmath>
+#include "constants.h"
+#include "valarray_updates.h"
 
 using namespace std;
 
 int main()
 {
-  ndarray<int> test {3,0,2};
-  for (int x : test)
-  {
-      cout << x << " ";
-  }
+    valarray<double> test1 {1.0, 2.0, 3.0};
 
-  return 0;
+    valarray<double> test = test1 * pi;
+    for(double x : test)
+    {
+        printf("%.8f ", x);
+    }
+    return 0;
 }
