@@ -9,12 +9,16 @@
 using namespace std;
 
 // first the simple operators
+
 template<class T1, typename T2>
 valarray<T1> operator*(valarray<T1> a, T2 b);
+
 template<class T1, typename T2>
 valarray<T1> operator+(valarray<T1> a, T2 b);
+
 template<class T1, typename T2>
 valarray<T1> operator-(valarray<T1> a, T2 b);
+
 template<class T1, typename T2>
 valarray<T1> operator/(valarray<T1> a, T2 b);
 

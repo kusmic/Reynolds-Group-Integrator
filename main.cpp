@@ -8,9 +8,15 @@ using namespace std;
 
 int main()
 {
-    valarray<double> test1 {1.0, 2.0, 3.0};
+    valarray<long double> test1 {1.0, 2.0, 3.0};
 
-    valarray<double> test = test1 * pi;
+    valarray<long double> test = test1 / pi;
+    for(double x : test)
+    {
+        printf("%.8f ", x);
+    }
+    printf("\n");
+    test = pi / test1;
     for(double x : test)
     {
         printf("%.8f ", x);
