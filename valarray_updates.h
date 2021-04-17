@@ -8,18 +8,27 @@
 
 using namespace std;
 
-// first the simple operators
+/*
+ * first the simple operators
+ */
 
-template<class T1, typename T2>
+// I can't for the love of all dieties get doubles to multiply with long doubles with valarrays
+// if you can find a solution, please implement
+valarray<double> operator*(valarray<double> a, long double b);
+valarray<double> operator+(valarray<double> a, long double b);
+valarray<double> operator-(valarray<double> a, long double b);
+valarray<double> operator/(valarray<double> a, long double b);
+
+template<typename T1, typename T2>
 valarray<T1> operator*(valarray<T1> a, T2 b);
 
-template<class T1, typename T2>
+template<typename T1, typename T2>
 valarray<T1> operator+(valarray<T1> a, T2 b);
 
-template<class T1, typename T2>
+template<typename T1, typename T2>
 valarray<T1> operator-(valarray<T1> a, T2 b);
 
-template<class T1, typename T2>
+template<typename T1, typename T2>
 valarray<T1> operator/(valarray<T1> a, T2 b);
 
 
