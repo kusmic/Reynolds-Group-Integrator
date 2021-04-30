@@ -70,7 +70,7 @@ vector<valarray<double>> butcher_tableaus_rk(string method){
      * Function to retrieve Butcher coefficients for the designated method.
      */
     int p;
-    vector<valarray<double>> coeffs (4)
+    vector<valarray<double>> coeffs (4);
 
     if (method == "rk4-fehlberg"){
         p=4;
