@@ -1,3 +1,0 @@
-C:/Users/samir/CLionProjects/Reynolds-Group-Integrator/cmake-build-debug/CMakeFiles/Reynolds_Group_Integrator.dir
-C:/Users/samir/CLionProjects/Reynolds-Group-Integrator/cmake-build-debug/CMakeFiles/edit_cache.dir
-C:/Users/samir/CLionProjects/Reynolds-Group-Integrator/cmake-build-debug/CMakeFiles/rebuild_cache.dir
