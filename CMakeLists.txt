@@ -12,4 +12,4 @@ include_directories(.)
 add_executable(Reynolds_Group_Integrator
         main.cpp
         valarray_updates.cpp
-        )
+        integratorfuncs.h integratorfuncs.cpp)
