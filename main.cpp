@@ -1,12 +1,11 @@
 #include <iostream>
 #include <valarray>
-#include <cmath>
-#include "constants.h"
 #include "valarray_updates.h"
 #include <vector>
 #include <ctime>
 #include <string>
-#include "integrator.h"
+#include "constants.h"
+
 using namespace std;
 
 int main()

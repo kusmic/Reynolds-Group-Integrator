@@ -2,15 +2,13 @@
 // Created by hecook on 4/29/21.
 //
 
-#include "integrator.h"
-#include "constants.h"
-#include "valarray_updates.h"
-#include <iostream>
-#include <valarray>
-#include <cmath>
 #include <vector>
 #include <ctime>
 #include <string>
+#include <iostream>
+#include <valarray>
+#include <cmath>
+#include "integrator.h"
 
 /*
  * #########################################################################################
