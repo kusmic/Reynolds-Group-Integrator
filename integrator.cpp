@@ -14,6 +14,27 @@
  * #########################################################################################
  */
 
+
+//vector<vector<vector<double>>> integrator(vector<valarray<double>> m, vector<valarray<double>> i_positions,
+//                                          vector<valarray<double>> i_velocities, vector<valarray<double>> t_tot,
+//                                          vector<valarray<double>> dt, string frame) {
+//
+//    int nsteps = (int)(t_tot / dt);
+//    float times;
+//
+//    times = [n_steps];
+//
+//    times = np.arange(0, t_tot, dt, dtype=np.float_)
+//    positions = []
+//    velocities = []
+//// populate with intitial values
+//    positions.append(i_positions)
+//    velocities.append(i_velocities)
+//}
+
+
+
+
 /* Table of Butcher coefficients */
 vector<vector<valarray<double>>> butcher_tableaus_rk(string method) {
 /*
