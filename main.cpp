@@ -5,6 +5,7 @@
 #include <ctime>
 #include <string>
 #include "constants.h"
+#include "integrator.h"
 
 using namespace std;
 
@@ -54,6 +55,10 @@ int main() {
             printf("\n");
         }
     }
+
+    cout << "Butcher Tableau Test" << endl;
+    cout << butcher_tableaus_rk("rk4-fehlberg") << endl;
+
     return 0;
 }
 
