@@ -94,7 +94,7 @@ integrator(valarray<double> masses, vector<valarray<double>> i_positions, vector
         vector<valarray<double>> x = positions.back();
         vector<valarray<double>> v = velocities.back();
 
-        vector<vector<valarray<double>>> coeffs = butcher_tableaus_rk(method;
+        vector<vector<valarray<double>>> coeffs = butcher_tableaus_rk(method);
         int stages = coeffs[1].size();
         int n = masses.size();
         int ndim = 3;
