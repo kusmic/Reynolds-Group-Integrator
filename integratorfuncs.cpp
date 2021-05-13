@@ -4,19 +4,30 @@
 
 #include "integratorfuncs.h"
 
-/*double com_shift(
-        vector<valarray<double>> m, vector<valarray<double>> p,
-        vector<valarray<double>> v, double dt)
-        {
+//###############################################################################
+
+vector<vector<valarray<double>>> com_shift(
+        valarray<double> m, vector<valarray<double>> p,
+        vector<valarray<double>> v, double dt){
         //"Apply a shift to positions and velocities to recenter Center of Mass on the origin"
-        std::double msum = m.sum();
-        std::vector<valarray<double>> p_COM = m[0] * p[0] + m[1] * p[1] / msum;
-        std::vector<valarray<double>> v_COM = m[0] * v[0] + m[1] * v[1] / msum;
-        p_COM = sum(m[:, np.newaxis] *p, axis = 0) / msum;
-        v_COM = sum(m[:, np.newaxis] *v, axis = 0) / msum;
-        p = p - p_COM;
-        v = v - v_COM;
-}*/
+        double msum = m.sum();
+        //std::valarray<double> p_COM = m[0] * p[0] + m[1] * p[1] / msum;
+        //std::valarray<double> v_COM = m[0] * v[0] + m[1] * v[1] / msum;
+        std::valarray<double> p_COM = {0.0,0.0,0.0};
+        std::valarray<double> v_COM = {0.0,0.0,0.0};
+    for (int i = 0 ; i < m.size(); i++) {
+                p_COM += m[i] * p[i];
+                v_COM += m[i] * v[i];
+            }
+
+    for(int i = 0; i < p.size(); i++) {
+        p[i] = p[i] - p_COM / msum;
+        v[i] = v[i] - v_COM / msum;
+    }
+    std::vector<vector<valarray<double>>> returnitem{p, v};
+    return returnitem;
+}
+
 //###############################################################################
 
 vector<valarray<double>> accelerations(valarray<double> masses, vector<valarray<double>> positions){
