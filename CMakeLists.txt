@@ -15,3 +15,7 @@ add_executable(Reynolds_Group_Integrator
         valarray_updates.cpp valarray_updates.h
         integrator.cpp integrator.h
         integratorfuncs.cpp integratorfuncs.h)
+
+include_directories(
+        hdf5-1.12.0/c++/
+        hdf5-1.12.0/c++/src)
