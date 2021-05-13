@@ -2,13 +2,14 @@
 // Created by Audrey Dijeau on 4/29/21.
 //
 
-#include "integratorfuncs.h"
+#include "integrator.h"
 
+using namespace std;
 //###############################################################################
 
 vector<vector<valarray<double>>> com_shift(
         valarray<double> m, vector<valarray<double>> p,
-        vector<valarray<double>> v, double dt){
+        vector<valarray<double>> v){
         //"Apply a shift to positions and velocities to recenter Center of Mass on the origin"
         double msum = m.sum();
         //std::valarray<double> p_COM = m[0] * p[0] + m[1] * p[1] / msum;
@@ -24,7 +25,7 @@ vector<vector<valarray<double>>> com_shift(
         p[i] = p[i] - p_COM / msum;
         v[i] = v[i] - v_COM / msum;
     }
-    std::vector<vector<valarray<double>>> returnitem{p, v};
+    std::vector<vector<valarray<double>>> returnitem {p, v};
     return returnitem;
 }
 
@@ -57,7 +58,7 @@ vector<valarray<double>> accelerations(valarray<double> masses, vector<valarray<
     return accels;
 };
 //###############################################################################
-vector<vector<valarray<double>>> ode(vector<valarray<double>> masses, vector<valarray<double>> positions,
+vector<vector<valarray<double>>> ode(valarray<double> masses, vector<valarray<double>> positions,
            vector<valarray<double>> velocities, double time)
            {
 /*

@@ -6,10 +6,8 @@
 #ifndef REYNOLDS_GROUP_INTEGRATOR_INTEGRATOR_H
 #define REYNOLDS_GROUP_INTEGRATOR_INTEGRATOR_H
 
-#include "valarray_updates.h"
 #include <vector>
-#include "integrator.h"
-#include "valarray_updates.h"
+#include "integratorfuncs.h"
 
 
 using namespace std;

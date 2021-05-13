@@ -7,19 +7,19 @@
 
 #include <iostream>
 #include <valarray>
-#include "valarray_updates.h"
+//#include "valarray_updates.h"
 #include <vector>
 #include <ctime>
 #include <cmath>
 #include <string>
-#include "constants.h"
+//#include "constants.h"
 #include <numeric>
 
 using namespace std;
 
-vector<vector<valarray<double>>> com_shift(valarray<double> m, vector<valarray<double>> p, vector<valarray<double>> v, double dt);
+vector<vector<valarray<double>>> com_shift(valarray<double> m, vector<valarray<double>> p, vector<valarray<double>> v);
 
-vector<valarray<double>> accelerations(vector<valarray<double>> masses, vector<valarray<double>> positions);
+vector<valarray<double>> accelerations(valarray<double> masses, vector<valarray<double>> positions);
 
 vector<vector<valarray<double>>> ode(valarray<double> masses, vector<valarray<double>> positions,
                                      vector<valarray<double>> velocities, double time);

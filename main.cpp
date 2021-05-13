@@ -4,13 +4,10 @@
 
 #include <iostream>
 #include <valarray>
-#include "valarray_updates.h"
 #include "integrator.h"
-#include "integratorfuncs.h"
 #include <vector>
 #include <ctime>
 #include <string>
-#include "constants.h"
 
 int main() {
     /*

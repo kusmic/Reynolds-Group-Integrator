@@ -10,8 +10,8 @@
 #include <cmath>
 #include "integrator.h"
 #include "integratorfuncs.h"
-#include "valarray_updates.h"
-#include "constants.h"
+
+using namespace std;
 
 /* Integrator Function */
 
@@ -147,10 +147,13 @@ OrbitData integrator(valarray<double> masses, vector<valarray<double>> i_positio
                 v[i] = v0[i] + v_aux[i] * dt;
             }
 
+            if(frame.compare("com") == 0) {
+                vector<vector<valarray<double>>> temp_com = com_shift(masses, x, v);
+                x = temp_com[0];
+                v = temp_com[1];
+            }
             positions.push_back(x);
             velocities.push_back(v);
-
-
 
         }
     }
