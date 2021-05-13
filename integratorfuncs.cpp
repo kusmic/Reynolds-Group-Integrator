@@ -19,7 +19,7 @@
 }*/
 //###############################################################################
 
-vector<valarray<double>> accelerations(vector<valarray<double>> masses, vector<valarray<double>> positions){
+vector<valarray<double>> accelerations(valarray<double> masses, vector<valarray<double>> positions){
     /*
     a function to compute the accelerations of the masses
             inputs: masses  = an array containing the masses of the objects
@@ -47,7 +47,7 @@ vector<valarray<double>> accelerations(vector<valarray<double>> masses, vector<v
 };
 //###############################################################################
 vector<vector<valarray<double>>> ode(vector<valarray<double>> masses, vector<valarray<double>> positions,
-           vector<valarray<double>> velocities, vector<valarray<double>> time)
+           vector<valarray<double>> velocities, double time)
            {
 /*
 a function to get the solutions of the ode of positions and velocity

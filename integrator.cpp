@@ -9,12 +9,13 @@
 #include <valarray>
 #include <cmath>
 #include "integrator.h"
-
+#include "integratorfuncs.h"
+#include "valarray_updates.h"
+#include "constants.h"
 
 /* Integrator Function */
 
-void //vector<vector<valarray<double>>>
-integrator(valarray<double> masses, vector<valarray<double>> i_positions, vector<valarray<double>> i_velocities,
+OrbitData integrator(valarray<double> masses, vector<valarray<double>> i_positions, vector<valarray<double>> i_velocities,
            double t_tot, double dt, string method, string frame) {
     /*
     a function which integrates the motion of n-bodies
@@ -95,13 +96,70 @@ integrator(valarray<double> masses, vector<valarray<double>> i_positions, vector
         vector<valarray<double>> v = velocities.back();
 
         vector<vector<valarray<double>>> coeffs = butcher_tableaus_rk(method);
+        vector<valarray<double>> a = coeffs[0];
+        vector<valarray<double>> b = coeffs[1];
+        vector<valarray<double>> c = coeffs[2];
+        vector<valarray<double>> p = coeffs[3];
+
         int stages = coeffs[1].size();
         int n = masses.size();
-        int ndim = 3;
+        int n_dimensions = 3;
+
+        valarray<double> tmp0 (0.0, n_dimensions);
+        vector<valarray<double>> tmp1 (n, tmp0);
+        vector<vector<valarray<double>>> kx (stages, tmp1);
+        vector<vector<valarray<double>>> kv (stages, tmp1);
+
+        vector<valarray<double>> x0 (x.begin(), x.end());
+        vector<valarray<double>> v0 (v.begin(), v.end());
+
+        vector<vector<valarray<double>>> temp_ode = ode(masses, x0, v0, times[i]);
+        kx[0] = temp_ode[0];
+        kv[0] = temp_ode[1];
+        for(int ii = 1; ii < stages; ii++) {
+            vector<valarray<double>> x_aux (n, tmp0);
+            vector<valarray<double>> v_aux (n, tmp0);
+            for(int jj = 0; jj < ii; jj++) {
+                for (int i = 0; i < x_aux.size(); i++) {
+                    x_aux[i] += a[ii-1][jj] * kx[jj][i];
+                    v_aux[i] += a[ii-1][jj] * kx[jj][i];
+                }
+                vector<valarray<double>> x0_new = x0;
+                vector<valarray<double>> v0_new = v0;
+                for(int i =0; i < x0_new.size(); i++) {
+                    x0_new[i] = x0[i] + x_aux[i] * dt;
+                    v0_new[i] = v0[i] + v_aux[i] * dt;
+                }
+                temp_ode = ode(masses, x0_new, v0_new, times[i]);
+            }
+
+            x_aux = tmp1;
+            v_aux = tmp1;
+            for(int ii = 0; ii < stages; ii++) {
+                for(int i = 0; i < x_aux.size(); i++) {
+                    x_aux[i] = b[ii][i] * kx[ii][i];
+                    v_aux[i] = b[ii][i] * kv[ii][i];
+                }
+            }
+
+            for(int i = 0; i < x.size(); i++) {
+                x[i] = x0[i] + x_aux[i] * dt;
+                v[i] = v0[i] + v_aux[i] * dt;
+            }
+
+            positions.push_back(x);
+            velocities.push_back(v);
 
 
+
+        }
     }
+    OrbitData returnValue;
+    returnValue.pos = positions;
+    returnValue.vel = velocities;
+    returnValue.times = times;
 
+    return returnValue;
 }
 
 /*

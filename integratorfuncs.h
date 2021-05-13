@@ -18,7 +18,7 @@ using namespace std;
 
 vector<valarray<double>> accelerations(vector<valarray<double>> masses, vector<valarray<double>> positions);
 
-vector<vector<valarray<double>>> ode(vector<valarray<double>> masses, vector<valarray<double>> positions,
-        vector<valarray<double>> velocities, vector<valarray<double>> time);
+vector<vector<valarray<double>>> ode(valarray<double> masses, vector<valarray<double>> positions,
+                                     vector<valarray<double>> velocities, double time);
 
 #endif //REYNOLDS_GROUP_INTEGRATOR_INTEGRATORFUNCS_H
