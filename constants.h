@@ -11,5 +11,6 @@
 using namespace std;
 
 long double pi = 3.14159265358979323846;
-long double G_AU_day = 0.00029591220828559;
+long double G_AU_day_normMsun = 0.00029591220828559;
+long double Msun = 1.9885e30 // kg
 #endif //REYNOLDS_GROUP_INTEGRATOR_CONSTANTS_H
