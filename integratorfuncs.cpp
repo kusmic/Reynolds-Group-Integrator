@@ -46,7 +46,7 @@ double accelerations(vector<valarray<double>> masses, vector<valarray<double>> p
     return accels
 }
 ###############################################################################
-def ode(masses, positions, velocities, time):
+double ode(vector<valarray<double>> masses, vector<valarray<double>> positions, vector<valarray<double>> velocities, vector<valarray<double>> time) {
 /*
 a function to get the solutions of the ode of positions and velocity
 inputs: masses = an array containing the masses of the objects
@@ -65,7 +65,8 @@ outputs: dxdt = the velocities input array
         of the same shape as the positions array
 */
 // get solutions to ode of position and velocity
-dxdt = velocities
-dvdt = accelerations(masses,positions)
+    std::vector<valarray<double>> dxdt = velocities
+    std::vector<valarray<double>> dvdt = accelerations(masses, positions)
 
-return dxdt, dvdt
+    return dxdt, dvdt
+}
