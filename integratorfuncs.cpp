@@ -48,10 +48,10 @@ vector<valarray<double>> accelerations(valarray<double> masses, vector<valarray<
     for (int i = 0 ; i < positions.size(); i++){
         for (int j = 0; j < positions.size(); j++){
             if(i != j){
-                std::valarray<double> r (0.0,3);
+                std::valarray<double> r {0.0, 0.0, 0.0};
                 r = positions[i] - positions[j];
-                double r_normal = sqrt(pow(r[0], 2.) + pow(r[1], 2.) +  pow(r[2], 2.));
-                accels[i] += -masses[j] *r/ pow(r_normal, 3);  // a = mu * r /(|r | **3), r is a vector
+                double r_normal = hypot(r[0], r[1], r[2]);
+                accels[i] += -masses[j] * r / pow(r_normal, 3);  // a = mu * r /(|r | **3), r is a vector
             }
         }
     }

@@ -91,80 +91,119 @@ OrbitData integrator(valarray<double> masses, vector<valarray<double>> i_positio
         exit (EXIT_FAILURE);
     }
 
-
-    for(int i = 0; i < times.size(); i++) {
+    if(method.compare("kdk") == 0) {
         vector<valarray<double>> x = positions.back();
         vector<valarray<double>> v = velocities.back();
 
-        vector<vector<valarray<double>>> coeffs = butcher_tableaus_rk(method);
-        vector<valarray<double>> a = {coeffs[0]};
-        vector<valarray<double>> b {coeffs[1].begin(), coeffs[1].end()};
-
-        int stages = coeffs[1].size();
-        int n = masses.size();
-        int n_dimensions = 3;
-
-        valarray<double> tmp0 {0., 0., 0.};
-        vector<valarray<double>> tmp1;
-        for(int i = 0; i < n; i++) {
-            tmp1.push_back(tmp0);
-            tmp1[i] = tmp0;
-        }
-
-        vector<vector<valarray<double>>> kx;
-        vector<vector<valarray<double>>> kv;
-        for(int i = 0; i < stages; i++) {
-
-            kx.push_back(tmp1);
-            kv.push_back(tmp1);
-        }
-
-        vector<valarray<double>> x0 (x.begin(), x.end());
-        vector<valarray<double>> v0 (v.begin(), v.end());
-
-        vector<vector<valarray<double>>> temp_ode = ode(masses, x0, v0, times[i]);
-        kx[0] = temp_ode[0];
-        kv[0] = temp_ode[1];
-        for(int ii = 1; ii < stages; ii++) {
-            vector<valarray<double>> x_aux = tmp1;
-            vector<valarray<double>> v_aux = tmp1;
-            for(int jj = 0; jj < ii; jj++) {
-                for (int i = 0; i < x_aux.size(); i++) {
-                    x_aux[i] += coeffs[0][ii-1][jj] * kx[jj][i];
-                    v_aux[i] += coeffs[0][ii-1][jj] * kx[jj][i];
+        vector<valarray<double>> acc_0 = accelerations(masses, x);
+        for(int ti = 0; ti < times.size(); ti++) {
+            //cout << ti << endl;
+            vector<valarray<double>> v_half{};
+            for (int i = 0; i < v.size(); i++) {
+                valarray<double> v_t {0., 0., 0.};
+                for(int vi = 0; vi < v[i].size(); vi++) {
+                    v_t[vi] = v[i][vi] + acc_0[i][vi] * (dt / 2.0);
                 }
-                vector<valarray<double>> x0_new = x0;
-                vector<valarray<double>> v0_new = v0;
-                for(int i =0; i < x0_new.size(); i++) {
-                    x0_new[i] = x0[i] + x_aux[i] * dt;
-                    v0_new[i] = v0[i] + v_aux[i] * dt;
-                }
-                temp_ode = ode(masses, x0_new, v0_new, times[i]);
-            }
+                // cout << v_t[0] << ", " << v[i][0] << ", " << acc_0[i][0] << endl;
 
-            x_aux = tmp1;
-            v_aux = tmp1;
-            for(int ii = 0; ii < stages; ii++) {
-                for(int i = 0; i < x_aux.size(); i++) {
-                    x_aux[i] = coeffs[1][ii][i] * kx[ii][i];
-                    v_aux[i] = coeffs[1][ii][i] * kv[ii][i];
+                v_half.push_back(valarray<double> {0., 0., 0.});
+                for(int vi = 0; vi < v[i].size(); vi++) {
+                    v_half[i][vi] = v_t[vi];
                 }
             }
-
-            for(int i = 0; i < x.size(); i++) {
-                x[i] = x0[i] + x_aux[i] * dt;
-                v[i] = v0[i] + v_aux[i] * dt;
+            vector<valarray<double>> pos{};
+            for (int i = 0; i < x.size(); i++) {
+                pos.push_back(x[i] + v_half[i] * dt);
+            }
+            vector<valarray<double>> acc_1 = accelerations(masses, pos);
+            vector<valarray<double>> vel{};
+            for (int i = 0; i < v.size(); i++) {
+                vel.push_back(v_half[i] + acc_1[i] * (dt / 2.0));
             }
 
-            if(frame.compare("com") == 0) {
-                vector<vector<valarray<double>>> temp_com = com_shift(masses, x, v);
-                x = temp_com[0];
-                v = temp_com[1];
-                delete &temp_com;
+            if (frame.compare("com") == 0) {
+                vector<vector<valarray<double>>> temp_com = com_shift(masses, pos, vel);
+                pos = temp_com[0];
+                vel = temp_com[1];
             }
             positions.push_back(x);
             velocities.push_back(v);
+        }
+    }
 
+    else if(method.compare("rk4-classic") == 0 || method.compare("rk4-fehlberg") == 0 || method.compare("rk5-fehlberg") == 0) {
+        for (int ti = 0; ti < times.size(); ti++) {
+            vector<valarray<double>> x = positions.back();
+            vector<valarray<double>> v = velocities.back();
+
+            vector<vector<valarray<double>>> coeffs = butcher_tableaus_rk(method);
+            vector<valarray<double>> a = {coeffs[0]};
+            vector<valarray<double>> b{coeffs[1].begin(), coeffs[1].end()};
+
+            int stages = coeffs[1].size();
+            int n = masses.size();
+            int n_dimensions = 3;
+
+            valarray<double> tmp0{0., 0., 0.};
+            vector<valarray<double>> tmp1;
+            for (int i = 0; i < n; i++) {
+                tmp1.push_back(tmp0);
+                tmp1[i] = tmp0;
+            }
+
+            vector<vector<valarray<double>>> kx;
+            vector<vector<valarray<double>>> kv;
+            for (int i = 0; i < stages; i++) {
+
+                kx.push_back(tmp1);
+                kv.push_back(tmp1);
+            }
+
+            vector<valarray<double>> x0(x.begin(), x.end());
+            vector<valarray<double>> v0(v.begin(), v.end());
+
+            vector<vector<valarray<double>>> temp_ode = ode(masses, x0, v0, times[ti]);
+            kx[0] = temp_ode[0];
+            kv[0] = temp_ode[1];
+            for (int ii = 1; ii < stages; ii++) {
+                vector<valarray<double>> x_aux = tmp1;
+                vector<valarray<double>> v_aux = tmp1;
+                for (int jj = 0; jj < ii; jj++) {
+                    for (int i = 0; i < x_aux.size(); i++) {
+                        x_aux[i] += coeffs[0][ii - 1][jj] * kx[jj][i];
+                        v_aux[i] += coeffs[0][ii - 1][jj] * kx[jj][i];
+                    }
+                    vector<valarray<double>> x0_new = x0;
+                    vector<valarray<double>> v0_new = v0;
+                    for (int i = 0; i < x0_new.size(); i++) {
+                        x0_new[i] = x0[i] + x_aux[i] * dt;
+                        v0_new[i] = v0[i] + v_aux[i] * dt;
+                    }
+                    temp_ode = ode(masses, x0_new, v0_new, times[ti]);
+                }
+
+                x_aux = tmp1;
+                v_aux = tmp1;
+                for (int ii = 0; ii < stages; ii++) {
+                    for (int i = 0; i < x_aux.size(); i++) {
+                        x_aux[i] = coeffs[1][ii][i] * kx[ii][i];
+                        v_aux[i] = coeffs[1][ii][i] * kv[ii][i];
+                    }
+                }
+
+                for (int i = 0; i < x.size(); i++) {
+                    x[i] = x0[i] + x_aux[i] * dt;
+                    v[i] = v0[i] + v_aux[i] * dt;
+                }
+
+                if (frame.compare("com") == 0) {
+                    vector<vector<valarray<double>>> temp_com = com_shift(masses, x, v);
+                    x = temp_com[0];
+                    v = temp_com[1];
+                }
+            }
+            positions.push_back(x);
+            velocities.push_back(v);
         }
     }
     OrbitData returnValue;
