@@ -74,7 +74,7 @@ OrbitData integrator(valarray<double> masses, vector<valarray<double>> i_positio
 
     try {
         vector<string> method_list {
-            "rk4-classic", "rk4-fehlberg", "rk5-fehlberg"
+            "kdk", "rk4-classic", "rk4-fehlberg", "rk5-fehlberg"
             };
         bool isOK = false;
         for(string meth : method_list) {
@@ -91,24 +91,33 @@ OrbitData integrator(valarray<double> masses, vector<valarray<double>> i_positio
         exit (EXIT_FAILURE);
     }
 
+
     for(int i = 0; i < times.size(); i++) {
         vector<valarray<double>> x = positions.back();
         vector<valarray<double>> v = velocities.back();
 
         vector<vector<valarray<double>>> coeffs = butcher_tableaus_rk(method);
-        vector<valarray<double>> a = coeffs[0];
-        vector<valarray<double>> b = coeffs[1];
-        vector<valarray<double>> c = coeffs[2];
-        vector<valarray<double>> p = coeffs[3];
+        vector<valarray<double>> a = {coeffs[0]};
+        vector<valarray<double>> b {coeffs[1].begin(), coeffs[1].end()};
 
         int stages = coeffs[1].size();
         int n = masses.size();
         int n_dimensions = 3;
 
-        valarray<double> tmp0 (0.0, n_dimensions);
-        vector<valarray<double>> tmp1 (n, tmp0);
-        vector<vector<valarray<double>>> kx (stages, tmp1);
-        vector<vector<valarray<double>>> kv (stages, tmp1);
+        valarray<double> tmp0 {0., 0., 0.};
+        vector<valarray<double>> tmp1;
+        for(int i = 0; i < n; i++) {
+            tmp1.push_back(tmp0);
+            tmp1[i] = tmp0;
+        }
+
+        vector<vector<valarray<double>>> kx;
+        vector<vector<valarray<double>>> kv;
+        for(int i = 0; i < stages; i++) {
+
+            kx.push_back(tmp1);
+            kv.push_back(tmp1);
+        }
 
         vector<valarray<double>> x0 (x.begin(), x.end());
         vector<valarray<double>> v0 (v.begin(), v.end());
@@ -117,12 +126,12 @@ OrbitData integrator(valarray<double> masses, vector<valarray<double>> i_positio
         kx[0] = temp_ode[0];
         kv[0] = temp_ode[1];
         for(int ii = 1; ii < stages; ii++) {
-            vector<valarray<double>> x_aux (n, tmp0);
-            vector<valarray<double>> v_aux (n, tmp0);
+            vector<valarray<double>> x_aux = tmp1;
+            vector<valarray<double>> v_aux = tmp1;
             for(int jj = 0; jj < ii; jj++) {
                 for (int i = 0; i < x_aux.size(); i++) {
-                    x_aux[i] += a[ii-1][jj] * kx[jj][i];
-                    v_aux[i] += a[ii-1][jj] * kx[jj][i];
+                    x_aux[i] += coeffs[0][ii-1][jj] * kx[jj][i];
+                    v_aux[i] += coeffs[0][ii-1][jj] * kx[jj][i];
                 }
                 vector<valarray<double>> x0_new = x0;
                 vector<valarray<double>> v0_new = v0;
@@ -137,8 +146,8 @@ OrbitData integrator(valarray<double> masses, vector<valarray<double>> i_positio
             v_aux = tmp1;
             for(int ii = 0; ii < stages; ii++) {
                 for(int i = 0; i < x_aux.size(); i++) {
-                    x_aux[i] = b[ii][i] * kx[ii][i];
-                    v_aux[i] = b[ii][i] * kv[ii][i];
+                    x_aux[i] = coeffs[1][ii][i] * kx[ii][i];
+                    v_aux[i] = coeffs[1][ii][i] * kv[ii][i];
                 }
             }
 
@@ -151,6 +160,7 @@ OrbitData integrator(valarray<double> masses, vector<valarray<double>> i_positio
                 vector<vector<valarray<double>>> temp_com = com_shift(masses, x, v);
                 x = temp_com[0];
                 v = temp_com[1];
+                delete &temp_com;
             }
             positions.push_back(x);
             velocities.push_back(v);
@@ -195,60 +205,64 @@ vector<vector<valarray<double>>> butcher_tableaus_rk(string method) {
 /*
  * Function to retrieve Butcher coefficients for the designated method.
  */
-    int p;
-    vector<vector<valarray<double>>> coeffs(4);
+    vector<vector<valarray<double>>> coeffs;
     vector<valarray<double>> a;
     vector<valarray<double>> b;
-    vector<valarray<double>> c;
-    vector<valarray<double>> tmp0;
 
     if (method.compare("rk4-fehlberg") == 0) {
-        p = 4;
-        vector<valarray<double>> a{
-                {1. / 4.,       0.,            0.,            0.,           0.},
-                {3. / 32.,      9. / 32.,       0.,            0.,           0.},
-                {1932. / 2197., -7200. / 2197., 7296. / 2197.,  0.,           0.},
-                {439. / 216.,   -8.,           3680. / 513.,   -845. / 4104., 0.},
-                {-8. / 27.,     2.,           -3544. / 2565., 1859. / 4104., -11. / 40.}
-        };
-        vector<valarray<double>> c{
+        // p = 4;
+        valarray<double> a0 {1. / 4.,       0.,            0.,            0.,           0.};
+        valarray<double> a1 {3. / 32.,      9. / 32.,       0.,            0.,           0.};
+        valarray<double> a2 {1932. / 2197., -7200. / 2197., 7296. / 2197.,  0.,           0.};
+        valarray<double> a3 {439. / 216.,   -8.,           3680. / 513.,   -845. / 4104., 0.};
+        valarray<double> a4 {-8. / 27.,     2.,           -3544. / 2565., 1859. / 4104., -11. / 40.};
+
+        a.push_back(a0);
+        a.push_back(a1);
+        a.push_back(a2);
+        a.push_back(a3);
+        a.push_back(a4);
+        /*vector<valarray<double>> c{
                 {1. / 4., 3. / 8., 12. / 13., 1., 0.5}
-        };
-        vector<valarray<double>> b{
-                {25. / 216., 0., 1408. / 2565., 2197. / 4104., -0.2, 0.}
-        };
+        };*/
+        valarray<double> b0 {25. / 216., 0., 1408. / 2565., 2197. / 4104., -0.2, 0.};
+        b.push_back(b0);
     } // rk4-fehlberg
 
     else if (method.compare("rk5-fehlberg") == 0) {
-        p = 5;
-        vector<valarray<double>> a{
-                {1. / 4.,       0.,            0.,            0.,           0.},
-                {3. / 32.,      9. / 32.,       0.,            0.,           0.},
-                {1932. / 2197., -7200. / 2197., 7296. / 2197.,  0.,           0.},
-                {439. / 216.,   -8.,           3680. / 513.,   -845. / 4104., 0.},
-                {-8. / 27.,     2.,           -3544. / 2565., 1859. / 4104., -11. / 40.}
-        };
-        vector<valarray<double>> c{
-                {1. / 4., 3. / 8., 12. / 13., 1., 0.5}
-        };
-        vector<valarray<double>> b{
-                {16. / 135., 0., 6656. / 12825., 28561. / 56430., -9. / 50., 2. / 55.}
-        };
+        //p = 5;
+        valarray<double> a0 {1. / 4.,       0.,            0.,            0.,           0.};
+        valarray<double> a1 {3. / 32.,      9. / 32.,       0.,            0.,           0.};
+        valarray<double> a2 {1932. / 2197., -7200. / 2197., 7296. / 2197.,  0.,           0.};
+        valarray<double> a3 {439. / 216.,   -8.,           3680. / 513.,   -845. / 4104., 0.};
+        valarray<double> a4 {-8. / 27.,     2.,           -3544. / 2565., 1859. / 4104., -11. / 40.};
+
+        a.push_back(a0);
+        a.push_back(a1);
+        a.push_back(a2);
+        a.push_back(a3);
+        a.push_back(a4);
+        //vector<valarray<double>> c{
+        //        {1. / 4., 3. / 8., 12. / 13., 1., 0.5}
+        //};
+        valarray<double> b0 {16. / 135., 0., 6656. / 12825., 28561. / 56430., -9. / 50., 2. / 55.};
+        b.push_back(b0);
     } // rk5-fehlberg
 
     else if (method.compare("rk4-classic") == 0) {
-        p = 4;
-        vector<valarray<double>> a{
-                {.5, 0.,  0.},
-                {0.,  .5, 0.},
-                {0.,  0.,  1.},
-        };
-        vector<valarray<double>> c{
-                {0., 1. / 2., 1. / 2., 1.}
-        };
-        vector<valarray<double>> b{
-                {1. / 6., 1. / 3., 1. / 3., 1. / 6.}
-        };
+        //p = 4;
+        valarray<double> a0 {.5, 0.,  0.};
+        valarray<double> a1 {0.,  .5, 0.};
+        valarray<double> a2 {0.,  0.,  1.};
+
+        a.push_back(a0);
+        a.push_back(a1);
+        a.push_back(a2);
+        //vector<valarray<double>> c{
+        //        {0., 1. / 2., 1. / 2., 1.}
+        //};
+        valarray<double> b0 {1. / 6., 1. / 3., 1. / 3., 1. / 6.};
+        b.push_back(b0);
     } // rk4-classic
 
     else {
@@ -256,20 +270,13 @@ vector<vector<valarray<double>>> butcher_tableaus_rk(string method) {
         exit(EXIT_FAILURE); // exits the code
     }
 
-    valarray<double> tmp1{static_cast<double>(p)};
+    //valarray<double> tmp1{static_cast<double>(p)};
 
-    tmp0.push_back(tmp1);
+    //tmp0.push_back(tmp1);
 
     // add each coeff. vector to the appropriate place
-    coeffs[0] = a;
-    coeffs[1] = b;
-    coeffs[2] = c;
-    coeffs[3] = tmp0;
-
-    delete &a;
-    delete &b;
-    delete &c;
-    delete &p;
+    coeffs.push_back(a);
+    coeffs.push_back(b);
 
     return coeffs;
 }

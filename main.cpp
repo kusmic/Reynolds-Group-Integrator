@@ -3,6 +3,7 @@
 //
 
 #include <iostream>
+#include <fstream>
 #include <valarray>
 #include "integrator.h"
 #include <vector>
@@ -70,7 +71,7 @@ int main() {
     vector<valarray<double>> v_all {v_Sol, v_Mer, v_Ven, v_Ear, v_Mar, v_Jup, v_Sat, v_Ura, v_Nep, v_Plu};
 
     double t_end = 1000 * 365.25; // time in days
-    double dt = 0.1; //days, this can be debated
+    double dt = 100.0; //days, this can be debated
     string method = "rk5-fehlberg";
     string frame = "com";
 
@@ -78,6 +79,8 @@ int main() {
     OrbitData SolSys_data = integrator(masses_all, x_all, v_all, t_end, dt, method, frame);
 
     double integrator_time = difftime(time(0), starttime);
+
+
 
     cout << integrator_time << endl;
     return 0;
